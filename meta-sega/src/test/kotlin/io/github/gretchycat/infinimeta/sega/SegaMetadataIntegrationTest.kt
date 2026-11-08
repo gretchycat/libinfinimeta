@@ -57,27 +57,27 @@ class SegaMetadataIntegrationTest {
     @Test fun distinguishesMasterSystemAndGameGearByHeaderRegion() {
         val sms = eightBitRom(0x8000, 0x7FF0, 3)
         val gg = eightBitRom(0x8000, 0x7FF0, 6)
-        assertEquals("sega-master-system-rom", inspect("game.sms", sms).metadata.single().record.formatId)
-        assertEquals("sega-game-gear-rom", inspect("game.gg", gg).metadata.single().record.formatId)
+        assertEquals("sega-master-system-rom", inspect("game.sms", sms).metadata.single { it.record.formatId == "sega-master-system-rom" }.record.formatId)
+        assertEquals("sega-game-gear-rom", inspect("game.gg", gg).metadata.single { it.record.formatId == "sega-game-gear-rom" }.record.formatId)
     }
 
     @Test fun recognizesSegaCdSaturnAndDreamcastHeaders() {
         val cd = ByteArray(4096).apply { putAscii(this, 0, "SEGADISCSYSTEM") }
-        assertEquals("sega-cd-disc-image", inspect("disc.iso", cd).metadata.single().record.formatId)
+        assertEquals("sega-cd-disc-image", inspect("disc.iso", cd).metadata.single { it.record.formatId == "sega-cd-disc-image" }.record.formatId)
 
         val saturn = ByteArray(2048).apply {
             putAscii(this, 0, "SEGA SEGASATURN ")
             putAscii(this, 0x40, "SATURN TEST GAME")
             putAscii(this, 0x50, "T-00000G")
         }
-        assertEquals("SATURN TEST GAME", inspect("saturn.bin", saturn).metadata.single().record.title)
+        assertEquals("SATURN TEST GAME", inspect("saturn.bin", saturn).metadata.single { it.record.formatId == "sega-saturn-disc" }.record.title)
 
         val dreamcast = ByteArray(2048).apply {
             putAscii(this, 0, "SEGA SEGAKATANA ")
             putAscii(this, 0x4A, "MK-00000")
             putAscii(this, 0xA0, "DREAMCAST TEST")
         }
-        assertEquals("DREAMCAST TEST", inspect("dreamcast.bin", dreamcast).metadata.single().record.title)
+        assertEquals("DREAMCAST TEST", inspect("dreamcast.bin", dreamcast).metadata.single { it.record.formatId == "sega-dreamcast-ipbin" }.record.title)
     }
 
     @Test fun reportsSg1000AsExtensionCandidateWithoutClaimingContentVerification() {

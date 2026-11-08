@@ -26,6 +26,8 @@ Identification confidence distinguishes `CANDIDATE` (extension or MIME associati
 
 Optional dependencies should be reported through handler availability; unsupported fields/formats belong in `limitations` or record warnings rather than placeholder values.
 
+Every new format module must provide bounded content confirmation (a magic signature or real parser validation) and typed metadata extraction through `MetadataCapabilityHandler`. Extension-only results stay `CANDIDATE`. See the common [Stream format-module requirements](../libinfinistream/CAPABILITIES.md#format-module-validation-and-metadata-requirements). Metadata tests must read real fixture bytes and verify both positive and negative cases; a generic source-length record from `MetadataRegistry` is useful fallback data, not a substitute for format-specific fields the parser can produce.
+
 ## Current format modules
 
 | Module | Detection / extracted fields | Limits |
@@ -55,4 +57,4 @@ The integration tests create small byte-level format fixtures and exercise the r
 
 ## Integration status
 
-The shared metadata capability interface is available to every `libinfini*` handler through `libinfinistream`, and the initial Sega handlers use it. Existing parsers in other libraries have not all been migrated to this common metadata contract yet; their capability APIs remain compatible while they are converted format by format.
+The shared metadata capability interface is available to every `libinfini*` handler through `libinfinistream`. Sega ROM parsers and the Sound playlist parser use it today. Canvas, Sound decoders, Scribe readers, Vault containers, Video and Store still have format-specific APIs that are covered by their library tests; migration of each of those metadata paths into the common record contract remains incremental.
