@@ -1,5 +1,23 @@
 # libinfinimeta
 
+## Reproducible standalone build
+
+Install JDK 17 or 21, Python 3, Android SDK platform 36/build tools 35.0.0,
+and (for JNI modules) NDK 27.2.12479018/CMake 3.22.1. Set `ANDROID_HOME` or
+this checkout's untracked `local.properties`. The checked-in Gradle 9.7.1 wrapper
+is verified by its distribution SHA-256.
+
+```sh
+python3 scripts/fetch-dependencies.py
+./gradlew test assemble
+```
+
+The lock includes only this library's required source dependencies, including
+transitive dependencies. Fetching checks pin agreement and refuses to overwrite
+local changes. `python3 scripts/fetch-dependencies.py --check` checks revisions.
+No application checkout is required. CI uses the same commands from a fresh clone.
+
+
 `libinfinimeta` identifies byte streams and extracts bounded, format-specific metadata. It has no Android or InfiniFolder dependency. Its public registry and parser contract live in `meta-core`; parser implementations are separate Gradle modules and register through `ServiceLoader<CapabilityProvider>`.
 
 ## Querying formats
@@ -26,7 +44,7 @@ Identification confidence distinguishes `CANDIDATE` (extension or MIME associati
 
 Optional dependencies should be reported through handler availability; unsupported fields/formats belong in `limitations` or record warnings rather than placeholder values.
 
-Every new format module must provide bounded content confirmation (a magic signature or real parser validation) and typed metadata extraction through `MetadataCapabilityHandler`. Extension-only results stay `CANDIDATE`. See the common [Stream format-module requirements](../libinfinistream/CAPABILITIES.md#format-module-validation-and-metadata-requirements). Metadata tests must read real fixture bytes and verify both positive and negative cases; a generic source-length record from `MetadataRegistry` is useful fallback data, not a substitute for format-specific fields the parser can produce.
+Every new format module must provide bounded content confirmation (a magic signature or real parser validation) and typed metadata extraction through `MetadataCapabilityHandler`. Extension-only results stay `CANDIDATE`. See the common [Stream format-module requirements](https://github.com/gretchycat/libinfinistream/blob/main/CAPABILITIES.md#format-module-validation-and-metadata-requirements). Metadata tests must read real fixture bytes and verify both positive and negative cases; a generic source-length record from `MetadataRegistry` is useful fallback data, not a substitute for format-specific fields the parser can produce.
 
 ## Current format modules
 
@@ -75,7 +93,7 @@ The console metadata aggregate advertises only `IDENTIFY` and `METADATA`. It doe
 
 ## Build and verification
 
-From this repository checkout, with its sibling `../libinfinistream` available:
+From this checkout, after running `python3 scripts/fetch-dependencies.py`:
 
 ```sh
 gradle :meta-sega:build
