@@ -50,12 +50,10 @@ class MetadataRegistry(private val capabilities: CapabilityRegistry = RuntimeCap
         discovered.forEach { found ->
             val match = toMatch(found, resource)
             val base = identityMetadata(found, resource)
-            val extractor = found.handler.service(MetadataCapabilityHandler::class.java)
-            val extracted = if (extractor != null &&
-                (Operations.METADATA in found.descriptor.operations || Operations.METADATA in found.operations)) {
+            val extracted = if (Operations.METADATA in found.descriptor.operations || Operations.METADATA in found.operations) {
                 try {
                     MetadataReadContext(resource, metadataBytes, maxNanos = metadataNanos,
-                        cancellation = cancellation).use(extractor::extractMetadata)
+                        cancellation = cancellation).use(found.handler::extractMetadata)
                 } catch (error: Exception) {
                     failures += MetadataFailure(found.descriptor.id, error.message ?: error.javaClass.simpleName)
                     null
